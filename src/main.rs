@@ -3,6 +3,7 @@ use axum::{
     Router,
 };
 mod routes;
+mod domain;
 
 #[tokio::main]
 async fn main() {

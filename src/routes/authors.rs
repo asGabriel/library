@@ -4,9 +4,9 @@ use axum::{
     routing::{get, patch, post},
     Json, Router,
 };
-use chrono::NaiveDate;
-use serde::Deserialize;
 use uuid::Uuid;
+
+use crate::domain::authors::{CreateAuthor, UpdateAuthor};
 
 pub(super) fn configure_routes() -> Router {
     Router::new().nest(
@@ -15,20 +15,6 @@ pub(super) fn configure_routes() -> Router {
         .route("/:author_id", get(get_author))
         .route("/:author_id", patch(update_author))
     )
-}
-
-#[derive(Deserialize, Debug)]
-#[serde(rename_all = "camelCase")]
-struct CreateAuthor {
-    name: String,
-    date_of_birth: NaiveDate,
-}
-
-#[derive(Deserialize, Debug)]
-#[serde(rename_all = "camelCase")]
-struct UpdateAuthor {
-    name: Option<String>,
-    date_of_birth: Option<NaiveDate> 
 }
 
 async fn create_author(Json(author): Json<CreateAuthor>) -> StatusCode {
