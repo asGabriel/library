@@ -1,0 +1,32 @@
+use super::SqlxRepository;
+use crate::domain::{
+    authors::{Author, CreateAuthor},
+    errors::Result,
+};
+use uuid::Uuid;
+
+#[async_trait::async_trait]
+pub trait AuthorRepository {
+    async fn create_author(&self, author: CreateAuthor) -> Result<Author>;
+}
+
+#[async_trait::async_trait]
+impl AuthorRepository for SqlxRepository {
+    async fn create_author(&self, author: CreateAuthor) -> Result<Author> {
+        let rec = sqlx::query_as!(
+            Author,
+            r#"
+            INSERT INTO AUTHORS (AUTHOR_ID, NAME, DATE_OF_BIRTH)
+            VALUES ( $1, $2, $3 )
+            RETURNING *
+            "#,
+            Uuid::new_v4(),
+            author.name,
+            author.date_of_birth
+        )
+        .fetch_one(&self.pool)
+        .await?;
+
+        Ok(rec)
+    }
+}
