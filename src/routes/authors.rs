@@ -9,9 +9,11 @@ use serde::Deserialize;
 use uuid::Uuid;
 
 pub(super) fn configure_routes() -> Router {
-    Router::new()
-        .route("/authors", post(create_author))
-        .route("/authors/:author_id", get(get_author))
+    Router::new().nest(
+        "/authors", Router::new()
+        .route("/", post(create_author))
+        .route("/:author_id", get(get_author))
+    )
 }
 
 #[derive(Deserialize, Debug)]
