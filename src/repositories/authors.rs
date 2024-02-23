@@ -59,7 +59,8 @@ impl AuthorRepository for SqlxRepository {
         let rec = sqlx::query_as!(
             Author,
             r#"
-            UPDATE AUTHORS SET NAME=$1, DATE_OF_BIRTH=$2, UPDATED_AT=NOW() WHERE AUTHOR_ID=$3 AND DELETION_TIME IS NULL
+            UPDATE AUTHORS SET NAME=COALESCE($1,NAME), DATE_OF_BIRTH=COALESCE($2,DATE_OF_BIRTH), UPDATED_AT=NOW() 
+            WHERE AUTHOR_ID=$3 AND DELETION_TIME IS NULL
             RETURNING *
             "#,
             author.name,
