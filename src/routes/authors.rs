@@ -10,7 +10,7 @@ use axum::{
 use uuid::Uuid;
 
 use crate::{
-    domain::authors::{CreateAuthor, UpdateAuthor},
+    domain::authors::{self, CreateAuthor, UpdateAuthor},
     repositories::authors::AuthorRepository,
 };
 
@@ -35,8 +35,19 @@ async fn create_author(
     }
 }
 
-async fn get_author(Path(author_id): Path<Uuid>) -> impl IntoResponse {
-    (StatusCode::OK, format!("author_id = {author_id}"))
+async fn get_author(
+    State(repository): State<Arc<dyn AuthorRepository + Send + Sync>>,
+    Path(author_id): Path<Uuid>,
+) -> impl IntoResponse {
+    if let Ok(author) = repository.get_author_by_id(author_id).await {
+        if let Some(author) = author {
+            (StatusCode::OK, Json::from(Some(author)))
+        } else {
+            (StatusCode::NOT_FOUND, Json::from(None))
+        }
+    } else {
+        (StatusCode::UNPROCESSABLE_ENTITY, Json::from(None))
+    }
 }
 
 async fn update_author(

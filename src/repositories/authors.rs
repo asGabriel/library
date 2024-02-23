@@ -8,6 +8,7 @@ use uuid::Uuid;
 #[async_trait::async_trait]
 pub trait AuthorRepository {
     async fn create_author(&self, author: CreateAuthor) -> Result<Author>;
+    async fn get_author_by_id(&self, author_id: Uuid) -> Result<Option<Author>>;
 }
 
 #[async_trait::async_trait]
@@ -25,6 +26,20 @@ impl AuthorRepository for SqlxRepository {
             author.date_of_birth
         )
         .fetch_one(&self.pool)
+        .await?;
+
+        Ok(rec)
+    }
+
+    async fn get_author_by_id(&self, author_id: Uuid) -> Result<Option<Author>> {
+        let rec = sqlx::query_as!(
+            Author,
+            r#"
+            SELECT * FROM AUTHORS WHERE AUTHOR_ID = $1
+            "#,
+            author_id
+        )
+        .fetch_optional(&self.pool)
         .await?;
 
         Ok(rec)
