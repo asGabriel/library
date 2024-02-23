@@ -4,13 +4,13 @@ use axum::{
     extract::{Json, Path, State},
     http::StatusCode,
     response::IntoResponse,
-    routing::{get, patch, post},
+    routing::{delete, get, patch, post},
     Router,
 };
 use uuid::Uuid;
 
 use crate::{
-    domain::authors::{self, CreateAuthor, UpdateAuthor},
+    domain::authors::{CreateAuthor, UpdateAuthor},
     repositories::authors::AuthorRepository,
 };
 
@@ -19,8 +19,9 @@ pub(super) fn configure_routes() -> Router<Arc<dyn AuthorRepository + Send + Syn
         "/authors",
         Router::new()
             .route("/", post(create_author))
-            .route("/:author_id", get(get_author))
-            .route("/:author_id", patch(update_author)),
+            .route("/:author_id", get(get_author_by_id))
+            .route("/:author_id", patch(update_author_by_id))
+            .route("/:author_id", delete(delete_author_by_id)),
     )
 }
 
@@ -35,7 +36,7 @@ async fn create_author(
     }
 }
 
-async fn get_author(
+async fn get_author_by_id(
     State(repository): State<Arc<dyn AuthorRepository + Send + Sync>>,
     Path(author_id): Path<Uuid>,
 ) -> impl IntoResponse {
@@ -50,12 +51,20 @@ async fn get_author(
     }
 }
 
-async fn update_author(
+async fn update_author_by_id(
+    State(repository): State<Arc<dyn AuthorRepository + Send + Sync>>,
     Path(author_id): Path<Uuid>,
     Json(author): Json<UpdateAuthor>,
 ) -> impl IntoResponse {
-    (
-        StatusCode::OK,
-        format!("author_id = {}, struct: {:?}", author_id, author),
-    )
+    if let Ok(author) = repository.update_author_by_id(author, author_id).await {
+        if let Some(author) = author {
+            (StatusCode::OK, Json::from(Some(author)))
+        } else {
+            (StatusCode::NOT_FOUND, Json::from(None))
+        }
+    } else {
+        (StatusCode::UNPROCESSABLE_ENTITY, Json::from(None))
+    }
 }
+
+async fn delete_author_by_id() {}
