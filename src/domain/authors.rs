@@ -10,6 +10,8 @@ pub struct Author {
     pub creation_time: DateTime<Utc>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub deletion_time: Option<DateTime<Utc>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<DateTime<Utc>>,
 }
 
 #[derive(Deserialize, Debug)]

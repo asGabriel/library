@@ -41,7 +41,7 @@ impl AuthorRepository for SqlxRepository {
         let rec = sqlx::query_as!(
             Author,
             r#"
-            SELECT * FROM AUTHORS WHERE AUTHOR_ID = $1 AND DELETION_TIME IS NOT NULL
+            SELECT * FROM AUTHORS WHERE AUTHOR_ID = $1 AND DELETION_TIME IS NULL
             "#,
             author_id
         )
@@ -59,7 +59,7 @@ impl AuthorRepository for SqlxRepository {
         let rec = sqlx::query_as!(
             Author,
             r#"
-            UPDATE AUTHORS SET NAME=$1, DATE_OF_BIRTH=$2 WHERE AUTHOR_ID=$3
+            UPDATE AUTHORS SET NAME=$1, DATE_OF_BIRTH=$2, UPDATED_AT=NOW() WHERE AUTHOR_ID=$3 AND DELETION_TIME IS NULL
             RETURNING *
             "#,
             author.name,
