@@ -67,4 +67,17 @@ async fn update_author_by_id(
     }
 }
 
-async fn delete_author_by_id() {}
+async fn delete_author_by_id(
+    State(repository): State<Arc<dyn AuthorRepository + Send + Sync>>,
+    Path(author_id): Path<Uuid>,
+) -> impl IntoResponse {
+    if let Ok(author) = repository.delete_author_by_id(author_id).await {
+        if let Some(author) = author {
+            (StatusCode::OK, Json::from(Some(author)))
+        } else {
+            (StatusCode::NOT_FOUND, Json::from(None))
+        }
+    } else {
+        (StatusCode::UNPROCESSABLE_ENTITY, Json::from(None))
+    }
+}
