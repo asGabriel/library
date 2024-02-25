@@ -1,11 +1,22 @@
-use std::sync::Arc;
+use axum::{http::StatusCode, response::IntoResponse, Router};
 
-use axum::Router;
-
-use crate::repositories::authors::AuthorRepository;
+use crate::{domain::errors::Error, handlers::Handler};
 mod authors;
 mod books;
 
-pub(super) fn configure_routes() -> Router<Arc<dyn AuthorRepository + Send + Sync>> {
+pub(super) fn configure_routes() -> Router<Handler> {
     authors::configure_routes()
+}
+
+impl IntoResponse for Error {
+    fn into_response(self) -> axum::response::Response {
+        match self {
+            Self::AuthorNotFound(author_id) => (
+                StatusCode::NOT_FOUND,
+                format!("Author {author_id} not found"),
+            ),
+            Self::DatabaseError(err) => (StatusCode::INTERNAL_SERVER_ERROR, format!("{err:?}")),
+        }
+        .into_response()
+    }
 }

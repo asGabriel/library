@@ -1,8 +1,5 @@
-use std::sync::Arc;
-
 use axum::{
     extract::{Json, Path, State},
-    http::StatusCode,
     response::IntoResponse,
     routing::{delete, get, patch, post},
     Router,
@@ -10,11 +7,14 @@ use axum::{
 use uuid::Uuid;
 
 use crate::{
-    domain::authors::{CreateAuthor, UpdateAuthor},
-    repositories::authors::AuthorRepository,
+    domain::{
+        authors::{CreateAuthor, UpdateAuthor},
+        errors::Result,
+    },
+    handlers::Handler,
 };
 
-pub(super) fn configure_routes() -> Router<Arc<dyn AuthorRepository + Send + Sync>> {
+pub(super) fn configure_routes() -> Router<Handler> {
     Router::new().nest(
         "/authors",
         Router::new()
@@ -26,58 +26,38 @@ pub(super) fn configure_routes() -> Router<Arc<dyn AuthorRepository + Send + Syn
 }
 
 async fn create_author(
-    State(repository): State<Arc<dyn AuthorRepository + Send + Sync>>,
+    State(handler): State<Handler>,
     Json(author): Json<CreateAuthor>,
-) -> impl IntoResponse {
-    if let Ok(author) = repository.create_author(author).await {
-        (StatusCode::CREATED, Json::from(Some(author)))
-    } else {
-        (StatusCode::UNPROCESSABLE_ENTITY, Json::from(None))
-    }
+) -> Result<impl IntoResponse> {
+    let author = handler.create_author(author).await?;
+
+    Ok(Json::from(author))
 }
 
 async fn get_author_by_id(
-    State(repository): State<Arc<dyn AuthorRepository + Send + Sync>>,
+    State(handler): State<Handler>,
     Path(author_id): Path<Uuid>,
-) -> impl IntoResponse {
-    if let Ok(author) = repository.get_author_by_id(author_id).await {
-        if let Some(author) = author {
-            (StatusCode::OK, Json::from(Some(author)))
-        } else {
-            (StatusCode::NOT_FOUND, Json::from(None))
-        }
-    } else {
-        (StatusCode::UNPROCESSABLE_ENTITY, Json::from(None))
-    }
+) -> Result<impl IntoResponse> {
+    let author = handler.get_author_by_id(author_id).await?;
+
+    Ok(Json(author))
 }
 
 async fn update_author_by_id(
-    State(repository): State<Arc<dyn AuthorRepository + Send + Sync>>,
+    State(handler): State<Handler>,
     Path(author_id): Path<Uuid>,
     Json(author): Json<UpdateAuthor>,
-) -> impl IntoResponse {
-    if let Ok(author) = repository.update_author_by_id(author, author_id).await {
-        if let Some(author) = author {
-            (StatusCode::OK, Json::from(Some(author)))
-        } else {
-            (StatusCode::NOT_FOUND, Json::from(None))
-        }
-    } else {
-        (StatusCode::UNPROCESSABLE_ENTITY, Json::from(None))
-    }
+) -> Result<impl IntoResponse> {
+    let author = handler.update_author_by_id(author_id, author).await?;
+
+    Ok(Json(author))
 }
 
 async fn delete_author_by_id(
-    State(repository): State<Arc<dyn AuthorRepository + Send + Sync>>,
+    State(handler): State<Handler>,
     Path(author_id): Path<Uuid>,
-) -> impl IntoResponse {
-    if let Ok(author) = repository.delete_author_by_id(author_id).await {
-        if let Some(author) = author {
-            (StatusCode::OK, Json::from(Some(author)))
-        } else {
-            (StatusCode::NOT_FOUND, Json::from(None))
-        }
-    } else {
-        (StatusCode::UNPROCESSABLE_ENTITY, Json::from(None))
-    }
+) -> Result<impl IntoResponse> {
+    let author = handler.delete_author_by_id(author_id).await?;
+
+    Ok(Json(author))
 }

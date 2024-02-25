@@ -14,3 +14,5 @@ serde = { version = "1.0.197", features = ["serde_derive"] }
 uuid = { version = "1.7.0", features = ["serde", "v4"] }
 async-trait = "0.1.77"
 dotenv = "0.15.0"
+thiserror = "1.0.57"
+mockall = "0.12.1"

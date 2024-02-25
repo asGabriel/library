@@ -1,5 +1,6 @@
 use std::sync::Arc;
 
+use handlers::Handler;
 use repositories::SqlxRepository;
 use sqlx::postgres::PgPoolOptions;
 mod domain;
@@ -19,9 +20,10 @@ async fn main() {
         .await
         .expect("Couldn't connect to the database");
 
-    let sqlx_repository = Arc::new(SqlxRepository::new(pool));
+    let sqlx_repository = SqlxRepository::new(pool);
+    let handler = Handler::new(Arc::new(sqlx_repository));
 
-    let app = routes::configure_routes().with_state(sqlx_repository);
+    let app = routes::configure_routes().with_state(handler);
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
     axum::serve(listener, app).await.unwrap();
