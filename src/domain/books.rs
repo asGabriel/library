@@ -24,7 +24,7 @@ pub struct Book {
 pub struct CreateBook {
     pub name: String,
     pub author_id: Uuid,
-    pub collection_id: Uuid,
+    pub collection_id: Option<Uuid>,
     pub genre: Genre,
     pub lang: Lang,
     pub rating: f64,
