@@ -5,7 +5,9 @@ mod authors;
 mod books;
 
 pub(super) fn configure_routes() -> Router<Handler> {
-    authors::configure_routes()
+    Router::new()
+        .merge(authors::configure_routes())
+        .merge(books::configure_routes())
 }
 
 impl IntoResponse for Error {

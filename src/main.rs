@@ -21,7 +21,10 @@ async fn main() {
         .expect("Couldn't connect to the database");
 
     let sqlx_repository = SqlxRepository::new(pool);
-    let handler = Handler::new(Arc::new(sqlx_repository));
+    let handler = Handler::new(
+        Arc::new(sqlx_repository.clone()),
+        Arc::new(sqlx_repository.clone()),
+    );
 
     let app = routes::configure_routes().with_state(handler);
 

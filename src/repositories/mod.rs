@@ -1,6 +1,8 @@
 pub mod authors;
+pub mod books;
 use sqlx::postgres::PgPool;
 
+#[derive(Clone)]
 pub struct SqlxRepository {
     pool: PgPool,
 }
