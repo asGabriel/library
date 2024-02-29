@@ -31,26 +31,26 @@ pub struct CreateBook {
 }
 
 #[derive(Debug, Serialize, Deserialize, sqlx::Type)]
-#[sqlx(type_name = "genre")]
-#[warn(non_camel_case_types)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+#[sqlx(type_name = "genre", rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum Genre {
-    ROMANCE,
-    MYSTERY,
-    SCIENCE_FICTION,
-    FANTASY,
-    NON_FICTION,
-    HISTORY,
-    BIOGRAPHY,
-    POETRY,
-    THRILLER,
-    SELF_HELP,
+    Romance,
+    Mystery,
+    ScienceFiction,
+    Fantasy,
+    NonFiction,
+    History,
+    Biography,
+    Poetry,
+    Thriller,
+    SelfHelp,
 }
-
 #[derive(Debug, Serialize, Deserialize, sqlx::Type)]
-#[sqlx(type_name = "lang")]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+#[sqlx(type_name = "lang", rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum Lang {
-    ENGLISH,
-    PORTUGUESE,
-    SPANISH,
-    GERMAN,
+    English,
+    Portuguese,
+    Spanish,
+    German,
 }
