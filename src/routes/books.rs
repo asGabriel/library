@@ -6,7 +6,7 @@ use crate::domain::errors::Result;
 use crate::handlers::Handler;
 
 pub(super) fn configure_routes() -> Router<Handler> {
-    Router::new().nest("/books", Router::new().route("/", post(create_books)))
+    Router::new().route("/books", post(create_books))
 }
 
 async fn create_books(
