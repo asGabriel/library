@@ -7,6 +7,8 @@ pub enum Error {
     DatabaseError(#[from] sqlx::Error),
     #[error("Author not found")]
     AuthorNotFound(Uuid),
+    #[error("Book not found")]
+    BookNotFound(Uuid),
 }
 
 pub type Result<T> = std::result::Result<T, Error>;

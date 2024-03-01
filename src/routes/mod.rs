@@ -17,6 +17,9 @@ impl IntoResponse for Error {
                 StatusCode::NOT_FOUND,
                 format!("Author {author_id} not found"),
             ),
+            Self::BookNotFound(book_id) => {
+                (StatusCode::NOT_FOUND, format!("Book {book_id} not found"))
+            }
             Self::DatabaseError(err) => (StatusCode::INTERNAL_SERVER_ERROR, format!("{err:?}")),
         }
         .into_response()
