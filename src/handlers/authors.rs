@@ -11,12 +11,14 @@ impl Handler {
     pub async fn create_author(&self, author: CreateAuthor) -> Result<Author> {
         self.author_repository.create_author(author).await
     }
+
     pub async fn get_author_by_id(&self, author_id: Uuid) -> Result<Author> {
         self.author_repository
             .get_author_by_id(author_id)
             .await?
             .ok_or(Error::AuthorNotFound(author_id))
     }
+
     pub async fn update_author_by_id(
         &self,
         author_id: Uuid,
