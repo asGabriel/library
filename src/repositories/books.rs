@@ -1,7 +1,7 @@
 use uuid::Uuid;
 
 use crate::domain::{
-    books::{Book, CreateBook, Genre, Lang},
+    books::{Book, CreateBook, Genre, Lang, UpdateBook},
     errors::Result,
 };
 
@@ -12,6 +12,7 @@ pub trait BookRepository {
     async fn create_book(&self, book: CreateBook) -> Result<Book>;
     async fn get_book_by_id(&self, book_id: Uuid) -> Result<Option<Book>>;
     async fn list_all_books(&self) -> Result<Vec<Book>>;
+    async fn update_book_by_id(&self, book_id: Uuid, book: UpdateBook) -> Result<Option<Book>>;
 }
 
 #[async_trait::async_trait]
@@ -78,5 +79,44 @@ impl BookRepository for SqlxRepository {
         .await?;
 
         Ok(books)
+    }
+
+    async fn update_book_by_id(&self, book_id: Uuid, book: UpdateBook) -> Result<Option<Book>> {
+        let book = sqlx::query_as!(
+            Book,
+            r#"
+            UPDATE BOOKS SET
+                AUTHOR_ID = COALESCE($2, AUTHOR_ID),
+                COLLECTION_ID = COALESCE($3, COLLECTION_ID), 
+                NAME = COALESCE($4, NAME),
+                GENRE = COALESCE($5, GENRE),
+                LANG = COALESCE($6, LANG),
+                RATING = COALESCE($7, RATING)
+            WHERE
+                BOOK_ID = $1 AND DELETION_TIME IS NULL
+            RETURNING
+                BOOK_ID, 
+                AUTHOR_ID,
+                COLLECTION_ID, 
+                NAME,
+                GENRE as "genre: _",
+                LANG as "lang: _",
+                RATING,
+                CREATION_TIME,
+                DELETION_TIME,
+                UPDATED_AT
+            "#,
+            book_id,
+            book.author_id,
+            book.collection_id,
+            book.name,
+            book.genre as _,
+            book.lang as _,
+            book.rating
+        )
+        .fetch_optional(&self.pool)
+        .await?;
+
+        Ok(book)
     }
 }
