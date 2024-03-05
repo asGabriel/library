@@ -18,4 +18,8 @@ impl Handler {
             .await?
             .ok_or(Error::BookNotFound(book_id))
     }
+
+    pub async fn list_all_books(&self) -> Result<Vec<Book>> {
+        self.book_repository.list_all_books().await
+    }
 }
