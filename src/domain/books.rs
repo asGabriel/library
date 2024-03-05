@@ -30,6 +30,15 @@ pub struct CreateBook {
     pub rating: f64,
 }
 
+pub struct UpdateBook {
+    pub name: Option<String>,
+    pub author_id: Option<Uuid>,
+    pub collection_id: Option<Uuid>,
+    pub genre: Option<Genre>,
+    pub lang: Option<Lang>,
+    pub rating: Option<f64>,
+}
+
 #[derive(Debug, Serialize, Deserialize, sqlx::Type)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 #[sqlx(type_name = "genre", rename_all = "SCREAMING_SNAKE_CASE")]

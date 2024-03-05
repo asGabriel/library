@@ -1,7 +1,7 @@
 use uuid::Uuid;
 
 use crate::domain::{
-    books::{Book, CreateBook},
+    books::{Book, CreateBook, UpdateBook},
     errors::{Error, Result},
 };
 
@@ -21,5 +21,12 @@ impl Handler {
 
     pub async fn list_all_books(&self) -> Result<Vec<Book>> {
         self.book_repository.list_all_books().await
+    }
+
+    pub async fn update_book_by_id(&self, book_id: Uuid, book: UpdateBook) -> Result<Book> {
+        self.book_repository
+            .update_book_by_id(book_id, book)
+            .await?
+            .ok_or(Error::BookNotFound(book_id))
     }
 }
