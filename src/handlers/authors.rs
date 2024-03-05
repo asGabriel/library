@@ -36,4 +36,8 @@ impl Handler {
             .await?
             .ok_or(Error::AuthorNotFound(author_id))
     }
+
+    pub async fn list_authors(&self) -> Result<Vec<Author>> {
+        self.author_repository.list_authors().await
+    }
 }
