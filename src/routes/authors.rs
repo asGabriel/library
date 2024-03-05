@@ -21,7 +21,8 @@ pub(super) fn configure_routes() -> Router<Handler> {
             .route("/", post(create_author))
             .route("/:author_id", get(get_author_by_id))
             .route("/:author_id", patch(update_author_by_id))
-            .route("/:author_id", delete(delete_author_by_id)),
+            .route("/:author_id", delete(delete_author_by_id))
+            .route("/", get(list_authors)),
     )
 }
 
@@ -60,4 +61,10 @@ async fn delete_author_by_id(
     let author = handler.delete_author_by_id(author_id).await?;
 
     Ok(Json(author))
+}
+
+async fn list_authors(State(handler): State<Handler>) -> Result<impl IntoResponse> {
+    let authors = handler.list_authors().await?;
+
+    Ok(Json::from(authors))
 }

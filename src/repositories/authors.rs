@@ -15,6 +15,7 @@ pub trait AuthorRepository {
         author_id: Uuid,
     ) -> Result<Option<Author>>;
     async fn delete_author_by_id(&self, author_id: Uuid) -> Result<Option<Author>>;
+    async fn list_authors(&self) -> Result<Vec<Author>>;
 }
 
 #[async_trait::async_trait]
@@ -86,5 +87,23 @@ impl AuthorRepository for SqlxRepository {
         .await?;
 
         Ok(rec)
+    }
+
+    async fn list_authors(&self) -> Result<Vec<Author>> {
+        let authors = sqlx::query_as!(
+            Author,
+            r#"
+            SELECT 
+                *
+            FROM 
+                AUTHORS 
+            WHERE 
+                DELETION_TIME IS NULL
+            "#
+        )
+        .fetch_all(&self.pool)
+        .await?;
+
+        Ok(authors)
     }
 }
