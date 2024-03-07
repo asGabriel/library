@@ -41,3 +41,30 @@ impl Handler {
         self.author_repository.list_authors().await
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use std::sync::Arc;
+
+    use super::*;
+    use crate::repositories::{authors::MockAuthorRepository, books::MockBookRepository};
+
+    #[tokio::test]
+    async fn test_get_author() {
+        let mut author_repository = MockAuthorRepository::new();
+        let book_repository = MockBookRepository::new();
+        let author_id = Uuid::default();
+
+        author_repository.expect_get_author_by_id().returning(|_| {
+            Err(Error::DatabaseError(sqlx::Error::Protocol(
+                Default::default(),
+            )))
+        });
+
+        let handler = Handler::new(Arc::new(author_repository), Arc::new(book_repository));
+
+        let error = handler.get_author_by_id(author_id).await.unwrap_err();
+
+        assert!(matches!(error, Error::DatabaseError(..)));
+    }
+}
