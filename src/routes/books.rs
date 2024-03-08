@@ -13,7 +13,8 @@ pub(super) fn configure_routes() -> Router<Handler> {
         "/books",
         Router::new()
             .route("/", post(create_books))
-            .route("/:book_id", get(get_book_by_id)),
+            .route("/:book_id", get(get_book_by_id))
+            .route("/", get(list_all_books)),
     )
 }
 
@@ -33,4 +34,10 @@ async fn get_book_by_id(
     let book = handler.get_book_by_id(book_id).await?;
 
     Ok(Json::from(book))
+}
+
+async fn list_all_books(State(handler): State<Handler>) -> Result<impl IntoResponse> {
+    let books = handler.list_all_books().await?;
+
+    Ok(Json(books))
 }

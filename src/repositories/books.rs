@@ -11,6 +11,7 @@ use super::SqlxRepository;
 pub trait BookRepository {
     async fn create_book(&self, book: CreateBook) -> Result<Book>;
     async fn get_book_by_id(&self, book_id: Uuid) -> Result<Option<Book>>;
+    async fn list_all_books(&self) -> Result<Vec<Book>>;
 }
 
 #[async_trait::async_trait]
@@ -50,5 +51,32 @@ impl BookRepository for SqlxRepository {
         .await?;
 
         Ok(book)
+    }
+
+    async fn list_all_books(&self) -> Result<Vec<Book>> {
+        let books = sqlx::query_as!(
+            Book,
+            r#"
+            SELECT 
+                BOOK_ID, 
+                AUTHOR_ID,
+                COLLECTION_ID, 
+                NAME,
+                genre as "genre: _",
+                lang as "lang: _",
+                RATING,
+                CREATION_TIME,
+                DELETION_TIME,
+                UPDATED_AT
+            FROM 
+                BOOKS 
+            WHERE 
+                DELETION_TIME IS NULL
+            "#
+        )
+        .fetch_all(&self.pool)
+        .await?;
+
+        Ok(books)
     }
 }
