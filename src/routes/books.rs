@@ -15,7 +15,7 @@ pub(super) fn configure_routes() -> Router<Handler> {
             .route("/", post(create_books))
             .route("/:book_id", get(get_book_by_id))
             .route("/", get(list_all_books))
-            .route("/:book_id", patch(update_book_by_id))
+            // .route("/:book_id", patch(update_book_by_id))
     )
 }
 
