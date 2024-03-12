@@ -30,6 +30,8 @@ pub struct CreateBook {
     pub rating: f64,
 }
 
+#[derive(Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
 pub struct UpdateBook {
     pub name: Option<String>,
     pub author_id: Option<Uuid>,
