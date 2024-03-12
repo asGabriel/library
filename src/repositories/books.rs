@@ -13,6 +13,7 @@ pub trait BookRepository {
     async fn get_book_by_id(&self, book_id: Uuid) -> Result<Option<Book>>;
     async fn list_all_books(&self) -> Result<Vec<Book>>;
     async fn update_book_by_id(&self, book_id: Uuid, book: UpdateBook) -> Result<Option<Book>>;
+    async fn delete_book_by_id(&self, book_id: Uuid) -> Result<Option<Book>>;
 }
 
 #[async_trait::async_trait]
@@ -113,6 +114,35 @@ impl BookRepository for SqlxRepository {
             book.genre as _,
             book.lang as _,
             book.rating
+        )
+        .fetch_optional(&self.pool)
+        .await?;
+
+        Ok(book)
+    }
+
+    async fn delete_book_by_id(&self, book_id: Uuid) -> Result<Option<Book>> {
+        let book = sqlx::query_as!(
+            Book,
+            r#"
+            UPDATE BOOKS SET
+                UPDATED_AT = NOW(),
+                DELETION_TIME = NOW()
+            WHERE
+                BOOK_ID = $1 AND DELETION_TIME IS NULL
+            RETURNING
+                BOOK_ID, 
+                AUTHOR_ID,
+                COLLECTION_ID, 
+                NAME,
+                GENRE as "genre: _",
+                LANG as "lang: _",
+                RATING,
+                CREATION_TIME,
+                DELETION_TIME,
+                UPDATED_AT
+            "#,
+            book_id
         )
         .fetch_optional(&self.pool)
         .await?;

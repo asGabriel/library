@@ -29,4 +29,11 @@ impl Handler {
             .await?
             .ok_or(Error::BookNotFound(book_id))
     }
+
+    pub async fn delete_book_by_id(&self, book_id: Uuid) -> Result<Book> {
+        self.book_repository
+            .delete_book_by_id(book_id)
+            .await?
+            .ok_or(Error::BookNotFound(book_id))
+    }
 }
