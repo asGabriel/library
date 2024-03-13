@@ -1,5 +1,6 @@
 pub mod authors;
 pub mod books;
+pub mod collections;
 use sqlx::postgres::PgPool;
 
 #[derive(Clone)]
