@@ -3,8 +3,10 @@ use crate::domain::{
     authors::{Author, CreateAuthor, UpdateAuthor},
     errors::Result,
 };
+use mockall::automock;
 use uuid::Uuid;
 
+#[automock]
 #[async_trait::async_trait]
 pub trait AuthorRepository {
     async fn create_author(&self, author: CreateAuthor) -> Result<Author>;

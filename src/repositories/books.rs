@@ -1,3 +1,4 @@
+use mockall::automock;
 use uuid::Uuid;
 
 use crate::domain::{
@@ -7,6 +8,7 @@ use crate::domain::{
 
 use super::SqlxRepository;
 
+#[automock]
 #[async_trait::async_trait]
 pub trait BookRepository {
     async fn create_book(&self, book: CreateBook) -> Result<Book>;
