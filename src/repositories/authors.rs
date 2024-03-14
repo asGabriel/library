@@ -23,7 +23,7 @@ pub trait AuthorRepository {
 #[async_trait::async_trait]
 impl AuthorRepository for SqlxRepository {
     async fn create_author(&self, author: CreateAuthor) -> Result<Author> {
-        let rec = sqlx::query_as!(
+        let author: Author = sqlx::query_as!(
             Author,
             r#"
             INSERT INTO AUTHORS (AUTHOR_ID, NAME, DATE_OF_BIRTH)
@@ -37,11 +37,11 @@ impl AuthorRepository for SqlxRepository {
         .fetch_one(&self.pool)
         .await?;
 
-        Ok(rec)
+        Ok(author)
     }
 
     async fn get_author_by_id(&self, author_id: Uuid) -> Result<Option<Author>> {
-        let rec = sqlx::query_as!(
+        let author = sqlx::query_as!(
             Author,
             r#"
             SELECT * FROM AUTHORS WHERE AUTHOR_ID = $1 AND DELETION_TIME IS NULL
@@ -51,7 +51,7 @@ impl AuthorRepository for SqlxRepository {
         .fetch_optional(&self.pool)
         .await?;
 
-        Ok(rec)
+        Ok(author)
     }
 
     async fn update_author_by_id(
@@ -59,7 +59,7 @@ impl AuthorRepository for SqlxRepository {
         author: UpdateAuthor,
         author_id: Uuid,
     ) -> Result<Option<Author>> {
-        let rec = sqlx::query_as!(
+        let author = sqlx::query_as!(
             Author,
             r#"
             UPDATE AUTHORS SET NAME=COALESCE($1,NAME), DATE_OF_BIRTH=COALESCE($2,DATE_OF_BIRTH), UPDATED_AT=NOW() 
@@ -73,11 +73,11 @@ impl AuthorRepository for SqlxRepository {
         .fetch_optional(&self.pool)
         .await?;
 
-        Ok(rec)
+        Ok(author)
     }
 
     async fn delete_author_by_id(&self, author_id: Uuid) -> Result<Option<Author>> {
-        let rec = sqlx::query_as!(
+        let author = sqlx::query_as!(
             Author,
             r#"
             UPDATE AUTHORS SET DELETION_TIME=NOW() WHERE AUTHOR_ID=$1 AND DELETION_TIME IS NULL
@@ -88,7 +88,7 @@ impl AuthorRepository for SqlxRepository {
         .fetch_optional(&self.pool)
         .await?;
 
-        Ok(rec)
+        Ok(author)
     }
 
     async fn list_authors(&self) -> Result<Vec<Author>> {
