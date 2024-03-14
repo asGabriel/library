@@ -12,6 +12,7 @@ use super::SqlxRepository;
 pub trait CollectionRepository {
     async fn create_collection(&self, collection: CreateCollection) -> Result<Collection>;
     async fn get_collection_by_id(&self, collection_id: Uuid) -> Result<Option<Collection>>;
+    async fn list_collections(&self) -> Result<Vec<Collection>>;
 }
 
 #[async_trait::async_trait]
@@ -56,5 +57,18 @@ impl CollectionRepository for SqlxRepository {
         .await?;
 
         Ok(collection)
+    }
+
+    async fn list_collections(&self) -> Result<Vec<Collection>> {
+        let collections = sqlx::query_as!(
+            Collection,
+            r#"
+            SELECT * FROM COLLECTIONS WHERE DELETION_TIME IS NULL
+            "#
+        )
+        .fetch_all(&self.pool)
+        .await?;
+
+        Ok(collections)
     }
 }

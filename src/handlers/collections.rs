@@ -20,4 +20,8 @@ impl Handler {
             .await?
             .ok_or(Error::CollectionNotFound(collection_id))
     }
+
+    pub async fn list_collections(&self) -> Result<Vec<Collection>> {
+        self.collection_repository.list_collections().await
+    }
 }
