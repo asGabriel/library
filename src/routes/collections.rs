@@ -16,7 +16,8 @@ pub(super) fn configure_routes() -> Router<Handler> {
         "/collections",
         Router::new()
             .route("/collections", post(create_collection))
-            .route("/:collection_id", get(get_collection_by_id)),
+            .route("/:collection_id", get(get_collection_by_id))
+            .route("/", get(list_collections)),
     )
 }
 
@@ -36,4 +37,10 @@ async fn get_collection_by_id(
     let collection = handler.get_collection_by_id(collection_id).await?;
 
     Ok(Json::from(collection))
+}
+
+async fn list_collections(State(handler): State<Handler>) -> Result<impl IntoResponse> {
+    let collections = handler.list_collections().await?;
+
+    Ok(Json::from(collections))
 }
