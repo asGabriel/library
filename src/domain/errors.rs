@@ -9,6 +9,8 @@ pub enum Error {
     AuthorNotFound(Uuid),
     #[error("Book not found")]
     BookNotFound(Uuid),
+    #[error("Collection not found")]
+    CollectionNotFound(Uuid),
 }
 
 pub type Result<T> = std::result::Result<T, Error>;

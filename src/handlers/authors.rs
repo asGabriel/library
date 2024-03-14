@@ -47,7 +47,10 @@ mod tests {
     use std::sync::Arc;
 
     use super::*;
-    use crate::repositories::{authors::MockAuthorRepository, books::MockBookRepository, collections::MockCollectionRepository};
+    use crate::repositories::{
+        authors::MockAuthorRepository, books::MockBookRepository,
+        collections::MockCollectionRepository,
+    };
 
     #[tokio::test]
     async fn test_get_author() {
@@ -62,7 +65,11 @@ mod tests {
             )))
         });
 
-        let handler = Handler::new(Arc::new(author_repository), Arc::new(book_repository), Arc::new(collection_repository));
+        let handler = Handler::new(
+            Arc::new(author_repository),
+            Arc::new(book_repository),
+            Arc::new(collection_repository),
+        );
 
         let error = handler.get_author_by_id(author_id).await.unwrap_err();
 

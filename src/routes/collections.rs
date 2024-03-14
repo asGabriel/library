@@ -1,4 +1,10 @@
-use axum::{extract::State, response::IntoResponse, routing::post, Json, Router};
+use axum::{
+    extract::{Path, State},
+    response::IntoResponse,
+    routing::{get, post},
+    Json, Router,
+};
+use uuid::Uuid;
 
 use crate::{
     domain::{collections::CreateCollection, errors::Result},
@@ -6,7 +12,12 @@ use crate::{
 };
 
 pub(super) fn configure_routes() -> Router<Handler> {
-    Router::new().route("/collections", post(create_collection))
+    Router::new().nest(
+        "/collections",
+        Router::new()
+            .route("/collections", post(create_collection))
+            .route("/:collection_id", get(get_collection_by_id)),
+    )
 }
 
 async fn create_collection(
@@ -14,6 +25,15 @@ async fn create_collection(
     Json(collection): Json<CreateCollection>,
 ) -> Result<impl IntoResponse> {
     let collection = handler.create_collection(collection).await?;
+
+    Ok(Json::from(collection))
+}
+
+async fn get_collection_by_id(
+    State(handler): State<Handler>,
+    Path(collection_id): Path<Uuid>,
+) -> Result<impl IntoResponse> {
+    let collection = handler.get_collection_by_id(collection_id).await?;
 
     Ok(Json::from(collection))
 }
