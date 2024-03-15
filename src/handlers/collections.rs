@@ -24,4 +24,11 @@ impl Handler {
     pub async fn list_collections(&self) -> Result<Vec<Collection>> {
         self.collection_repository.list_collections().await
     }
+
+    pub async fn delete_collection_by_id(&self, collection_id: Uuid) -> Result<Collection> {
+        self.collection_repository
+            .delete_collection_by_id(collection_id)
+            .await?
+            .ok_or(Error::CollectionNotFound(collection_id))
+    }
 }
