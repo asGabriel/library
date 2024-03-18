@@ -5,7 +5,7 @@ use uuid::Uuid;
 #[derive(Serialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct Collection {
-    pub collection_id: String,
+    pub collection_id: Uuid,
     pub name: String,
     pub book_ids: Vec<Uuid>,
     pub creation_time: DateTime<Utc>,

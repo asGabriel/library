@@ -5,7 +5,7 @@ use uuid::Uuid;
 #[derive(Serialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct Book {
-    pub book_id: String,
+    pub book_id: Uuid,
     pub author_id: Option<Uuid>,
     pub collection_id: Option<Uuid>,
     pub name: String,
@@ -19,7 +19,7 @@ pub struct Book {
     pub updated_at: Option<DateTime<Utc>>,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct CreateBook {
     pub name: String,
@@ -41,7 +41,7 @@ pub struct UpdateBook {
     pub rating: Option<f64>,
 }
 
-#[derive(Debug, Serialize, Deserialize, sqlx::Type)]
+#[derive(Debug, Serialize, Deserialize, sqlx::Type, Clone)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 #[sqlx(type_name = "genre", rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum Genre {
@@ -56,7 +56,7 @@ pub enum Genre {
     Thriller,
     SelfHelp,
 }
-#[derive(Debug, Serialize, Deserialize, sqlx::Type)]
+#[derive(Debug, Serialize, Deserialize, sqlx::Type, Clone)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 #[sqlx(type_name = "lang", rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum Lang {
