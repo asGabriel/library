@@ -41,7 +41,7 @@ pub struct UpdateBook {
     pub rating: Option<f64>,
 }
 
-#[derive(Debug, Serialize, Deserialize, sqlx::Type, Clone)]
+#[derive(Debug, Serialize, Deserialize, sqlx::Type, Clone, Copy)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 #[sqlx(type_name = "genre", rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum Genre {
@@ -56,7 +56,7 @@ pub enum Genre {
     Thriller,
     SelfHelp,
 }
-#[derive(Debug, Serialize, Deserialize, sqlx::Type, Clone)]
+#[derive(Debug, Serialize, Deserialize, sqlx::Type, Clone, Copy)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 #[sqlx(type_name = "lang", rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum Lang {
