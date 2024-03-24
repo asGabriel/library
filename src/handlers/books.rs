@@ -9,7 +9,18 @@ use super::Handler;
 
 impl Handler {
     pub async fn create_book(&self, book: CreateBook) -> Result<Book> {
-        self.book_repository.create_book(book).await
+        let created_book = self.book_repository.create_book(&book).await?;
+
+        if let Some(collection) = book.collection_id {
+            let collection_validated = self.get_collection_by_id(collection).await?;
+
+            let _ = self.collection_repository.insert_book_into_collection(
+                collection_validated.collection_id,
+                created_book.book_id,
+            ).await;
+        }
+
+        Ok(created_book)
     }
 
     pub async fn get_book_by_id(&self, book_id: Uuid) -> Result<Book> {
