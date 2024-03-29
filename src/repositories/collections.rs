@@ -1,4 +1,5 @@
 use crate::domain::{
+    books::Book,
     collections::{Collection, CreateCollection},
     errors::Result,
 };
@@ -14,6 +15,7 @@ pub trait CollectionRepository {
     async fn get_collection_by_id(&self, collection_id: Uuid) -> Result<Option<Collection>>;
     async fn list_collections(&self) -> Result<Vec<Collection>>;
     async fn delete_collection_by_id(&self, collection_id: Uuid) -> Result<Option<Collection>>;
+    async fn remove_books_from_collection(&self, collection_id: Uuid) -> Result<Vec<Book>>;
 }
 
 #[async_trait::async_trait]
@@ -92,5 +94,33 @@ impl CollectionRepository for SqlxRepository {
         .await?;
 
         Ok(collection)
+    }
+
+    async fn remove_books_from_collection(&self, collection_id: Uuid) -> Result<Vec<Book>> {
+        let collection_books = sqlx::query_as!(
+            Book,
+            r#"
+            UPDATE BOOKS SET
+                COLLECTION_ID = NULL
+            WHERE
+                COLLECTION_ID = $1 
+            RETURNING
+                BOOK_ID, 
+                AUTHOR_ID,
+                COLLECTION_ID, 
+                NAME,
+                GENRE as "genre: _",
+                LANG as "lang: _",
+                RATING,
+                CREATION_TIME,
+                DELETION_TIME,
+                UPDATED_AT
+            "#,
+            collection_id
+        )
+        .fetch_all(&self.pool)
+        .await?;
+
+        Ok(collection_books)
     }
 }

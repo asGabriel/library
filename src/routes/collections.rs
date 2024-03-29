@@ -18,7 +18,7 @@ pub(super) fn configure_routes() -> Router<Handler> {
             .route("/collections", post(create_collection))
             .route("/:collection_id", get(get_collection_by_id))
             .route("/", get(list_collections))
-            .route("/:collection_id", delete(delete_collection_by_id))
+            .route("/:collection_id", delete(delete_collection_by_id)),
     )
 }
 
