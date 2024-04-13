@@ -13,6 +13,11 @@ pub trait CollectionRepository {
     async fn create_collection(&self, collection: CreateCollection) -> Result<Collection>;
     async fn get_collection_by_id(&self, collection_id: Uuid) -> Result<Option<Collection>>;
     async fn list_collections(&self) -> Result<Vec<Collection>>;
+    async fn insert_book_into_collection(
+        &self,
+        collection_id: Uuid,
+        book_id: Uuid,
+    ) -> Result<Option<Collection>>;
 }
 
 #[async_trait::async_trait]
@@ -70,5 +75,28 @@ impl CollectionRepository for SqlxRepository {
         .await?;
 
         Ok(collections)
+    }
+
+    async fn insert_book_into_collection(
+        &self,
+        collection_id: Uuid,
+        book_id: Uuid,
+    ) -> Result<Option<Collection>> {
+        let collection = sqlx::query_as!(
+            Collection,
+            r#"
+            UPDATE COLLECTIONS SET
+                BOOK_IDS = ARRAY_APPEND(BOOK_IDS, $1)
+            WHERE
+                COLLECTION_ID = $2
+            RETURNING *
+            "#,
+            book_id,
+            collection_id
+        )
+        .fetch_optional(&self.pool)
+        .await?;
+
+        Ok(collection)
     }
 }
